@@ -506,29 +506,7 @@ export default function TopRepos() {
             </button>
           )}
         </div>
-      {repos.length > 10 && (
-  <div className="relative mb-3">
-    <input
-      type="text"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      placeholder="Search repositories…"
-      aria-label="Search repositories"
-      className="w-full rounded-lg border border-[var(--border)] bg-[var(--control)] px-3 py-1.5 pr-10 text-sm text-[var(--card-foreground)] placeholder:text-[var(--muted-foreground)]"
-    />
-
-    {searchQuery.length > 0 && (
-      <button
-        type="button"
-        onClick={() => setSearchQuery("")}
-        aria-label="Clear search"
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] hover:text-[var(--card-foreground)]"
-      >
-        ✕
-      </button>
-    )}
-  </div>
-)}
+      
         <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)] mb-2 px-0">
           <button
             type="button"
@@ -553,55 +531,66 @@ export default function TopRepos() {
             </span>
           </button>
         </div>
-        <ul className="space-y-3">
-          {filteredRepos.length === 0 ? (
-            <p className="text-sm text-[var(--muted-foreground)] py-4 text-center">
-              No repos match your search.
-            </p>
-          ) : filteredRepos.map((repo, idx) => {
-            const isPinned = pinnedRepos.includes(repo.name);
-            const barWidth = Math.max(
-              Math.round((repo.commits / maxCommits) * 100),
-              4
-            );
-            const shortName = repo.name.split("/")[1] ?? repo.name;
-            const health = healthScores[repo.name];
-            return (
-              <RepoItem
-                key={repo.name}
-                repo={repo}
-                idx={idx}
-                isPinned={isPinned}
-                barWidth={barWidth}
-                shortName={shortName}
-                health={health}
-                healthLoading={healthLoading}
-                onSelectActivity={setSelectedRepoForActivity}
-                onSelectHealth={setActiveHealthRepo}
-                onTogglePin={togglePin}
-              />
-            );
-          })}
-        </ul>
-      </>
-      )}
-      {lastUpdated && (
-        <p className="text-xs text-[var(--muted-foreground)] mt-2 text-right">
-         {minutesAgo === 0 ? "Updated just now" : `Updated ${minutesAgo} min ago`}
-        </p>
-     )}
-      {activeHealthRepo && healthScores[activeHealthRepo] && (
-        <RepoHealthPanel
-          health={healthScores[activeHealthRepo]}
-          isOpen={true}
-          onClose={() => setActiveHealthRepo(null)}
+<ul className="space-y-3">
+  {filteredRepos.length === 0 ? (
+    <p className="text-sm text-[var(--muted-foreground)] py-4 text-center">
+      No repos match your search.
+    </p>
+  ) : (
+    filteredRepos.map((repo, idx) => {
+      const isPinned = pinnedRepos.includes(repo.name);
+
+      const barWidth = Math.max(
+        Math.round((repo.commits / maxCommits) * 100),
+        4
+      );
+
+      const shortName = repo.name.split("/")[1] ?? repo.name;
+      const health = healthScores[repo.name];
+
+      return (
+        <RepoItem
+          key={repo.name}
+          repo={repo}
+          idx={idx}
+          isPinned={isPinned}
+          barWidth={barWidth}
+          shortName={shortName}
+          health={health}
+          healthLoading={healthLoading}
+          onSelectActivity={setSelectedRepoForActivity}
+          onSelectHealth={setActiveHealthRepo}
+          onTogglePin={togglePin}
         />
-      )}
-      <RepoActivityDrawer
-        repoName={selectedRepoForActivity || ""}
-        isOpen={!!selectedRepoForActivity}
-        onClose={() => setSelectedRepoForActivity(null)}
-      />
+      );
+    })
+  )}
+</ul>
+
+</>
+)}
+
+{lastUpdated && (
+  <p className="text-xs text-[var(--muted-foreground)] mt-2 text-right">
+    {minutesAgo === 0
+      ? "Updated just now"
+      : `Updated ${minutesAgo} min ago`}
+  </p>
+)}
+
+{activeHealthRepo && healthScores[activeHealthRepo] && (
+  <RepoHealthPanel
+    health={healthScores[activeHealthRepo]}
+    isOpen={true}
+    onClose={() => setActiveHealthRepo(null)}
+  />
+)}
+
+<RepoActivityDrawer
+  repoName={selectedRepoForActivity || ""}
+  isOpen={!!selectedRepoForActivity}
+  onClose={() => setSelectedRepoForActivity(null)}
+/>
     </div>
   );
 }
