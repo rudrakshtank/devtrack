@@ -273,6 +273,7 @@ describe('GoalTracker - useGoalTracker Hook', () => {
           deadline: null,
           is_public: false,
           period_start: '2026-05-30T00:00:00.000Z',
+          week_start: null,
           last_synced_at: null,
           last_period: null,
         }

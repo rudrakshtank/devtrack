@@ -120,6 +120,7 @@ export async function GET() {
             current: 0,
             period_start: periodStart.toISOString(),
             goal_reset_version: oldVersion + 1,
+            week_start: periodStart.toISOString().split("T")[0],
           })
           .eq("id", goal.id)
           .eq("goal_reset_version", oldVersion)
@@ -274,7 +275,6 @@ try {
       { status: 400 }
     );
   }
-
   const { data: goal, error } = await supabaseAdmin
     .from("goals")
     .insert({
@@ -291,8 +291,9 @@ try {
     .select()
     .single();
 
-  if (error) return Response.json({ error: error.message }, { status: 500 });
-
+  if (error) {
+  return Response.json({ error: error.message }, { status: 500 });
+}
   dispatchToAllWebhooks(user.id, "goal.created", {
     goalId: goal.id,
     title: goal.title,
