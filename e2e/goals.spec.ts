@@ -9,11 +9,6 @@ import {
  * goals.spec.ts
  * Covers: create goal → appears in list; delete goal → removed from list.
  */
-
-/*
-issue 3309 
-*/
-
 const AUTH_SECRET =
   process.env.NEXTAUTH_SECRET ?? "test-nextauth-secret-for-playwright-tests";
 
