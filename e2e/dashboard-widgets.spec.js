@@ -126,9 +126,7 @@ test.beforeEach(async ({ page }) => {
     });
   });
 
-  // Use regex to exactly match /api/goals or /api/goals?params
-  // Prevents shadowing /api/goals/sync
-  await page.route(/\/api\/goals(\?|$)/, async (route) => {
+  await page.route("**/api/goals**", async (route) => {
     if (route.request().method() === "POST") {
       await route.fulfill({
         contentType: "application/json",
@@ -251,7 +249,7 @@ test("dashboard widgets render with mocked metrics", async ({ page }) => {
 test("contribution graph range buttons request a new range", async ({
   page,
 }) => {
-  const contributionRequests: string[] = [];
+  const contributionRequests = [];
   page.on("request", (request) => {
     if (request.url().includes("/api/metrics/contributions")) {
       contributionRequests.push(request.url());
@@ -262,8 +260,7 @@ test("contribution graph range buttons request a new range", async ({
   await expect(
     page.getByRole("heading", { name: "Dashboard", exact: true })
   ).toBeVisible({ timeout: 30000 });
-  
-  // Click only the correctly scoped locator 
+  await page.getByRole("button", { name: "Show 90-day range" }).first().click();
   await page
     .locator("#contribution-activity")
     .getByRole("button", { name: "Show 90-day range" })
@@ -277,7 +274,7 @@ test("contribution graph range buttons request a new range", async ({
 });
 
 test("goal form posts a new goal", async ({ page }) => {
-  const goalPosts: unknown[] = [];
+  const goalPosts = [];
   page.on("request", (request) => {
     if (request.url().endsWith("/api/goals") && request.method() === "POST") {
       goalPosts.push(request.postDataJSON());
@@ -293,8 +290,7 @@ test("goal form posts a new goal", async ({ page }) => {
   await page.getByLabel("Unit", { exact: true }).selectOption("prs");
   await page.getByRole("button", { name: "Create goal" }).click();
 
-  // Evaluate the length primitive to avoid array reference polling issues
-  await expect.poll(() => goalPosts.length, { timeout: 15000 }).toBe(1);
+  await expect.poll(() => goalPosts, { timeout: 15000 }).toHaveLength(1);
   expect(goalPosts[0]).toMatchObject({
     title: "Ship one PR",
     target: 1,
@@ -302,7 +298,7 @@ test("goal form posts a new goal", async ({ page }) => {
   });
 });
 
-function mockMetricResponse(url: string) {
+function mockMetricResponse(url) {
   if (url.includes("/api/metrics/prs")) {
     return {
       open: 2,
